@@ -25,3 +25,68 @@ nav a:focus-visible {
   outline: 3px solid #174ea6;
   outline-offset: 3px;
 }
+/* Master–Detail Layout */
+.directory {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) 2fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.directory-sidebar,
+.detail-panel {
+  min-width: 0;
+  padding: 20px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+.people-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.people-list li {
+  margin-bottom: 8px;
+}
+
+.person-link {
+  display: block;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.person-link.active {
+  background: #dbeafe;
+  color: #1e3a8a;
+  font-weight: bold;
+}
+
+.person-details dt {
+  font-weight: bold;
+  margin-top: 12px;
+}
+
+.person-details dd {
+  margin: 4px 0 12px;
+  overflow-wrap: anywhere;
+}
+
+a:focus-visible {
+  outline: 3px solid #174ea6;
+  outline-offset: 3px;
+}
+
+/* Responsive Layout */
+@media (max-width: 640px) {
+  .directory {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-container {
+    padding: 16px;
+  }
+}
