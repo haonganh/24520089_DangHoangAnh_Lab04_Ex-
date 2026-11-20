@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router";
 import PeopleLayout from "./layouts/PeopleLayout";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import PersonDetail from "./components/PersonDetail";
 
 import "./App.css";
 
@@ -18,7 +19,7 @@ export default function App() {
 
           <Route
             path="people/:id"
-            element={<p>Person details coming soon.</p>}
+            element={<PersonDetail />}
           />
         </Route>
 

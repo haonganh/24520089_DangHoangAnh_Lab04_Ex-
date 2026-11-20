@@ -1,10 +1,23 @@
+/* =========================
+   1. MAIN LAYOUT
+========================= */
+
 .app-container {
+  width: 100%;
   max-width: 1200px;
-  margin: auto;
+  margin: 0 auto;
   padding: 24px;
 }
 
-nav {
+.app-container > header {
+  margin-bottom: 24px;
+}
+
+/* =========================
+   2. MAIN NAVIGATION
+========================= */
+
+nav[aria-label="Main navigation"] {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
@@ -14,6 +27,7 @@ nav {
 nav a {
   color: #174ea6;
   padding: 8px;
+  border-radius: 4px;
 }
 
 nav a.active {
@@ -21,14 +35,18 @@ nav a.active {
   text-decoration: underline;
 }
 
-nav a:focus-visible {
+a:focus-visible {
   outline: 3px solid #174ea6;
   outline-offset: 3px;
 }
-/* Master–Detail Layout */
+
+/* =========================
+   3. MASTER-DETAIL LAYOUT
+========================= */
+
 .directory {
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) 2fr;
+  grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr);
   gap: 24px;
   align-items: start;
 }
@@ -41,6 +59,10 @@ nav a:focus-visible {
   border: 1px solid #cbd5e1;
   border-radius: 8px;
 }
+
+/* =========================
+   4. PEOPLE LIST
+========================= */
 
 .people-list {
   list-style: none;
@@ -56,14 +78,25 @@ nav a:focus-visible {
 .person-link {
   display: block;
   padding: 12px;
+  color: #174ea6;
   border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+
+.person-link:hover {
+  background: #e2e8f0;
 }
 
 .person-link.active {
   background: #dbeafe;
   color: #1e3a8a;
   font-weight: bold;
+  text-decoration: underline;
 }
+
+/* =========================
+   5. PERSON DETAILS
+========================= */
 
 .person-details dt {
   font-weight: bold;
@@ -75,27 +108,16 @@ nav a:focus-visible {
   overflow-wrap: anywhere;
 }
 
-a:focus-visible {
-  outline: 3px solid #174ea6;
-  outline-offset: 3px;
-}
+/* =========================
+   6. SKELETON LOADING
+========================= */
 
-/* Responsive Layout */
-@media (max-width: 640px) {
-  .directory {
-    grid-template-columns: minmax(0, 1fr);
-  }
+/* Reserve space to reduce CLS */
 
-  .app-container {
-    padding: 16px;
-  }
-}
-/* Reserve space to reduce layout shifts */
 .detail-panel {
   min-height: 320px;
 }
 
-/* Skeleton Loading */
 .person-skeleton {
   min-height: 260px;
 }
@@ -121,6 +143,10 @@ a:focus-visible {
   width: 70%;
 }
 
+/* =========================
+   7. SCREEN READER SUPPORT
+========================= */
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -133,8 +159,13 @@ a:focus-visible {
   border: 0;
 }
 
+/* =========================
+   8. SKELETON ANIMATION
+========================= */
+
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
 
@@ -143,7 +174,31 @@ a:focus-visible {
   }
 }
 
-/* WCAG 2.2 - Reduced Motion */
+/* =========================
+   9. RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 640px) {
+  .directory {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .app-container {
+    padding: 16px;
+  }
+
+  .directory-sidebar,
+  .detail-panel {
+    padding: 16px;
+  }
+}
+
+/* =========================
+   10. WCAG 2.2 AA
+   REDUCED MOTION
+========================= */
+
 @media (prefers-reduced-motion: reduce) {
   .skeleton {
     animation: none;
