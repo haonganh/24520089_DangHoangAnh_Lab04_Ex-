@@ -1,148 +1,164 @@
-# AI Collaboration Rules — Lab 4, Exercise 1.3
+# AI Collaboration Rules — Lab 4, Exercise 1.3 and Sprint 3
 
-**Project:** Legacy Validation Anti-Patterns + Sprint 3 `useForumMessages` & Live Channel Switcher  
-**Language for documentation and code comments:** English  
-**Conversation with student:** Vietnamese unless requested otherwise  
+**Required workspace:** `24520089_DangHoangAnh_Lab04_Ex/Lab04_Exercise02/`  
+**Required frontend:** **React + TypeScript (TSX) only; exactly one frontend app**  
+**Documentation and code comments:** English  
+**Student-facing instructions:** Vietnamese unless otherwise requested  
 **Accessibility target:** WCAG 2.2 Level AA
 
-## 1. Purpose and boundaries
+## 1. Project boundaries — mandatory
 
-The AI is a **step-by-step programming tutor**, not an unattended one-shot solution generator. Help the student understand, implement, debug, test, and commit Exercise 1.3 and the accompanying Sprint 3 requirements shown in the supplied slides.
+1. Work **only within `Lab04_Exercise02/`** for Exercise 1.3 and Sprint 3.
+2. Create **one** frontend in `Lab04_Exercise02/app`, using the Vite `react-ts` template unless an instructor-supplied TSX starter already exists.
+3. Write React components in `.tsx` and non-JSX frontend logic/types in `.ts`. **Do not create `Exercise_JSX`, `.jsx` components, or a second JSX frontend.**
+4. `Lab04_Exercise01/` is the previous exercise; **do not modify or move its files** and do not import its implementation as the active Exercise 1.3 app.
+5. Keep `ai_rule.md`, `task_decomposition.md`, and evidence in `Lab04_Exercise02/`. A backend may live in `Lab04_Exercise02/server/`; it is a full-stack API service, **not a second JSX application**. Prefer TypeScript for new backend code if no starter imposes another language.
+6. Use the **existing Git repository** at `24520089_DangHoangAnh_Lab04_Ex/`; **do not create a nested repository** or change the remote without explicit instruction.
+7. The screenshots establish the validation anti-pattern analysis and Sprint 3 network/error checkpoints. They do **not** specify form fields, backend implementation, API schema, ports, exact Git commit count, or grading scores. Mark unspecified design choices clearly as assumptions.
 
-Preserve the existing Exercise 1.1/1.2 application functionality. Based on the instructor's previously stated requirement for Exercise 1, maintain separate **JSX** and **TSX** frontend implementations. A single real API service may be shared by both.
+## 2. Step-by-step tutoring protocol
 
-The slides explicitly show:
-- A legacy chain of five `useEffect` operations between `InputField` and `SimpleForm`, risking cascaded renders, stale validation, and update-depth errors.
-- A full-stack `useForumMessages` hook and live channel switcher for the exact channels `nasa`, `esports-tribunal`, and `notNasa`.
-- A **Slow 3G** Chrome DevTools cancellation checkpoint using `AbortController` on rapid switches.
-- Saved full-stack error-log verification.
+1. Follow `Lab04_Exercise02/task_decomposition.md` in order, starting from the next unfinished task.
+2. Teach **one manageable subtask at a time**; accelerate only if the student requests a continuous walkthrough.
+3. For every step provide: **goal → exact path → short code/PowerShell commands → expected behavior → test**; include Git commit instructions at defined milestones.
+4. Start commands with the correct working directory: `Lab04_Exercise02` for setup/docs, `Lab04_Exercise02/app` for frontend npm scripts, and `Lab04_Exercise02/server` for backend commands if a server exists.
+5. Prefer focused edits over rewriting unrelated files; first inspect starter code and preserve any instructor-specific contracts.
+6. Explain state ownership, effect dependencies and cleanup, network aborts, and relevant accessibility semantics briefly but precisely.
+7. Stop after the current step and accept `done`, terminal output, or screenshots before continuing, unless asked to keep going.
+8. Never claim code was run, a build passed, the Network panel showed cancellation, or GitHub was updated without evidence.
+9. When errors occur, use the exact compiler/terminal message and propose the smallest safe fix. Avoid unsupported commands and forced Git operations.
 
-Do **not** invent instructor-required form fields, server endpoints, schemas, score thresholds, commit counts, or grading criteria. When needed, label choices as **implementation assumptions** and use supplied starter code as the source of truth.
+## 3. Source-of-truth for the assignment
 
-## 2. Interaction protocol
+The two supplied slides explicitly describe:
 
-1. Follow `task_decomposition.md` in order, beginning with the next unfinished task/subtask.
-2. Provide **one manageable subtask at a time**, unless the student explicitly asks to proceed continuously.
-3. Each step must include: objective, exact files to create/edit, concise code or command, expected result, and a verification check.
-4. Explain briefly **why** the change fixes a problem, especially React state ownership, effect dependencies, cleanup, and accessibility.
-5. Prefer minimal edits compatible with existing code over replacing whole files. Ask for the actual error or affected code when the solution depends on project specifics.
-6. After a step, wait for `done`, a screenshot, or an error report before moving on—unless the student requests a faster multi-step walkthrough.
-7. Never claim that a command, test, build, screenshot check, or Git push succeeded without evidence.
-8. Provide PowerShell-friendly commands for Windows and state the required working directory; do not assume the terminal is in the repository root.
-9. Keep the explanation concise but technically complete. Do not introduce unrelated libraries or abstractions.
+- **Exercise 1.3: Legacy Validation Anti-Patterns** involving five `useEffect` operations across `InputField` and `SimpleForm`: `syncToParent`, `validateField`, `calcFormValidity`, `syncErrorsToChild`, and `autoScrollToError`.
+- Risks: **cascading re-renders**, rapidly typed values producing stale/out-of-order updates, and potential `Maximum update depth exceeded` errors.
+- **Sprint 3: Full-Stack `useForumMessages` & Live Channel Switcher**, using exact channel identifiers `nasa`, `esports-tribunal`, and `notNasa`.
+- Chrome DevTools verification on simulated **Slow 3G** that obsolete in-flight requests are cancelled using `AbortController`, plus **saved full-stack error-log evidence**.
 
-## 3. React architecture and validation rules
+**Implementation agreement for this student:** TSX only in `Lab04_Exercise02`. Do not re-introduce the earlier two-frontend plan into this exercise.
 
-- First **analyze** the legacy five-effect chain; then refactor rather than preserving the anti-pattern in production.
-- Use a **single source of truth** for form values, normally in `SimpleForm`. `InputField` should receive controlled `value`, `onChange`, accessibility IDs, and error information through props.
-- Perform deterministic synchronous validation with **pure functions**, deriving field errors and `isValid` from current values when practical.
-- Do not synchronize state from child to parent and back through chained effects.
-- Do not store trivially derived values in separate state solely to recompute them in `useEffect`.
-- Prefer event handlers for user-triggered work (typing, submit, channel selection). Use effects to synchronize with genuine external systems, including network requests.
-- Do not set state unconditionally during rendering or build mutually dependent effect loops.
-- Avoid validating on every keystroke if it creates intrusive error announcements; document when validation occurs (blur, submit, or appropriate change-time feedback).
-- For failed submissions, identify invalid fields and focus the first invalid control in a predictable, accessible manner. Do **not** auto-scroll to errors on every keypress.
-- Preserve realistic rendering behavior: the slide's “5 re-renders/keypress” is an illustrated legacy failure, not a guaranteed measurement. React Strict Mode may add development-only render/effect cycles.
-- Use React DevTools Profiler and repeatable tests for performance claims. Do not declare a zero-render target.
+## 4. React / TypeScript validation architecture
 
-## 4. `useForumMessages` and full-stack rules
+- Analyze the five-effect chain first. If the legacy code does not exist, create a **safe, clearly labeled illustration** rather than making the production app intentionally loop.
+- Keep form values in one owner, usually `SimpleForm.tsx`; keep `InputField.tsx` as a controlled component receiving typed props.
+- Define `FormValues`, `FormErrors`, `InputFieldProps`, and event types; prefer `import type` for type-only imports. Avoid unneeded `any` and unsafe assertions.
+- Implement synchronous, deterministic validation using **pure functions**; derive validation results from current values instead of mirroring derived state through `useEffect`.
+- **Never** create `InputField` → parent → `InputField` effect-sync cycles, unconditional `setState` in render, or effects with unstable dependencies that repeatedly update each other.
+- Perform user-triggered changes in event handlers; use effects for actual external synchronization such as fetch requests.
+- Avoid excessive error announcements during typing. Choose a reasonable validation timing (blur, submit, or measured change-time updates).
+- On failed submit, present actionable errors and focus the first invalid field; do not auto-scroll to an error on every keystroke.
+- Treat "5 re-renders/keypress" as an **illustrated slide outcome**, not a guaranteed result; account for development React Strict Mode when profiling.
+- Confirm improvements with React DevTools Profiler and tested states, not arbitrary render-count promises.
 
-- `useForumMessages` must call an actual backend API for all three specified channels, not rely on a local mock as the final Sprint 3 result.
-- Inspect the backend or starter requirements to determine the actual URL, response shape, and error semantics. If implementing an API, document the chosen contract before writing the frontend.
-- For every request, create a fresh `AbortController`, pass `signal` to `fetch`, and call `abort()` on dependency change or unmount.
-- Protect state updates against stale/out-of-order responses. Cleanup and cancellation are central acceptance criteria.
-- Do not present intentional cancellation as an error to the user; distinguish `AbortError` / aborted signals from genuine HTTP/network failures.
-- Check non-2xx HTTP responses explicitly (`fetch()` does not automatically reject for HTTP 404/500).
-- Handle and display **loading, success, empty, and error** states. Never show stale messages as belonging to a newly selected channel.
-- Treat `notNasa` as a normal named channel unless the actual API contract explicitly defines otherwise. Do not manufacture an error for it.
-- Confirm backend/client startup commands and ports in the actual project. Never hardcode credentials or commit `.env` secrets.
-- A browser cancellation is evidence of client abort, **not necessarily** proof that a server already executing the request stopped work.
+## 5. `useForumMessages` and full-stack API rules
 
-## 5. TypeScript and JSX parity
+- Implement `src/hooks/useForumMessages.ts` using a **real backend request**. Do not present local in-memory frontend mock messages as final Sprint 3 completion.
+- Inspect a supplied backend first. If no API exists, document a minimal contract and implement a local server **inside `Lab04_Exercise02/server/`**.
+- Define a strict `Channel` union of `"nasa" | "esports-tribunal" | "notNasa"`, typed message models, and typed hook state.
+- Treat `notNasa` as a valid named channel unless the actual instructor API says otherwise; do not create a fake failure for it.
+- Create a **fresh `AbortController` for each request**; pass its signal into `fetch`; abort in effect cleanup on channel change or unmount.
+- Handle `AbortError` and aborted signals as expected cancellation, **not** user-facing network errors.
+- Explicitly handle HTTP non-2xx status codes, connectivity failures, malformed data, and empty results. Types alone do not validate external JSON at runtime.
+- Prevent out-of-order responses from replacing data of a newer channel. A loading state must not falsely display old-channel messages as current.
+- Expose accessible **loading, success, empty, and error** states, with sensible retry behavior when applicable.
+- Never commit `.env` secrets, access tokens, personally identifying data, or private backend logs.
+- A cancelled fetch in Chrome proves client cancellation; it does **not** automatically prove that server-side work stopped.
 
-- Implement and verify the JSX version, then translate the **same behavior** to TSX.
-- Use `.jsx`/`.js` only in the JSX frontend; use `.tsx`/`.ts` and appropriate interfaces/types in the TSX frontend.
-- Define a `Channel` union using exactly `"nasa" | "esports-tribunal" | "notNasa"` in TSX.
-- Type hook arguments/results, form props, events, and server response data. Avoid `any` unless justified and documented.
-- TypeScript annotations do not validate untrusted JSON at runtime; validate API payloads when necessary.
-- Do not copy compiled build output or `node_modules` between projects.
-- Retain matching features, UI states, error handling, and accessibility across both projects.
+## 6. WCAG 2.2 Level AA requirements
 
-## 6. WCAG 2.2 AA rules
+Use native semantic HTML whenever possible. Applicable Level A and AA criteria include:
 
-Apply the relevant **Level A and AA** success criteria (rather than claiming one ARIA attribute guarantees compliance):
-
-| Criterion | Implementation rule / check |
+| WCAG criterion | Minimum implementation / verification |
 | --- | --- |
-| 1.3.1 Info and Relationships | Use `<label>`, `<form>`, headings, groups, and programmatic associations. |
-| 1.4.3 Contrast (Minimum) | Normal text contrast at least 4.5:1; large text at least 3:1 (subject to WCAG exceptions). |
-| 1.4.10 Reflow | Test at 320 CSS px equivalent; no loss of content/functionality or avoidable horizontal scroll. |
-| 1.4.11 Non-text Contrast | Interactive control boundaries and focus indicators meet applicable 3:1 requirements. |
-| 2.1.1 Keyboard | Form and channel switcher usable with keyboard alone. |
-| 2.4.3 Focus Order | Keep focus in a logical sequence during validation and state changes. |
-| 2.4.7 Focus Visible | Ensure clearly visible focus styles on interactive controls. |
-| 2.4.11 Focus Not Obscured (Minimum) | Focused controls are not entirely hidden by other content. |
-| 3.3.1 Error Identification | Identify fields in error and describe the issue in text. |
-| 3.3.2 Labels or Instructions | Provide persistent labels and required-format guidance where appropriate. |
-| 3.3.3 Error Suggestion | When corrections are known, suggest them without compromising security/purpose. |
-| 4.1.2 Name, Role, Value | Native controls and correct accessible names; use `aria-invalid` where relevant. |
-| 4.1.3 Status Messages | Expose loading/results without focus theft where applicable; test announcements. |
+| **1.3.1 Info and Relationships** | Associate form labels, descriptions, field groups, and headings with correct HTML semantics. |
+| **1.4.3 Contrast (Minimum)** | Test normal text at 4.5:1 and large text at 3:1, except applicable WCAG exceptions. |
+| **1.4.10 Reflow** | Verify usable layout at 320 CSS px equivalent without lost content or avoidable two-dimensional scrolling. |
+| **1.4.11 Non-text Contrast** | Test applicable control boundaries and visual state indicators at 3:1. |
+| **2.1.1 Keyboard** | Form and channel switcher must be fully keyboard operable. |
+| **2.4.3 Focus Order** | Preserve logical sequential focus through fields, buttons, and status content. |
+| **2.4.7 Focus Visible** | Provide a clear focus indicator. |
+| **2.4.11 Focus Not Obscured (Minimum)** | Ensure focused controls are not entirely covered by other content. |
+| **3.3.1 Error Identification** | State which field is wrong and explain the error in text. |
+| **3.3.2 Labels or Instructions** | Provide explicit labels and necessary format/required-field guidance. |
+| **3.3.3 Error Suggestion** | Suggest corrections when feasible and safe. |
+| **4.1.2 Name, Role, Value** | Prefer native inputs, buttons, and selects with accessible names. |
+| **4.1.3 Status Messages** | Make nonurgent loading/results available to assistive technology without unnecessary focus changes. |
 
-**Practical requirements:**
-- Connect inline errors to inputs via `aria-describedby`; set `aria-invalid="true"` when invalid.
-- Use `role="status"` or `aria-live="polite"` for nonurgent loading/result updates **when appropriate**; use a suitable assertive error announcement when necessary. Avoid multiple live regions redundantly announcing each keystroke.
-- A channel picker must have an accessible label (`<select>` + `<label>`, or equivalent accessible buttons/radio group). Display the currently selected channel.
-- Status changes must be perceivable without relying on color alone.
-- Respect `prefers-reduced-motion` for nonessential animation.
-- Test with keyboard, browser zoom, a screen reader where possible, and automated tools; Lighthouse scores alone do not establish WCAG conformance.
-- Verify form validation, loading, empty result, success, backend failure, and aborted-request states.
+Practical rules:
 
-## 7. Testing and evidence rules
+- Use `<label htmlFor="...">` matching the input's `id`. Add visible error text and reference it with `aria-describedby`; set `aria-invalid` for invalid fields.
+- Prefer a labeled native `<select>` for channels. Present the currently active channel and use meaningful text (not color alone) for statuses.
+- Use an appropriate **single** polite status announcement for loading/result updates and a suitable alert strategy for errors. Avoid duplicated live-region announcements on every keystroke.
+- Preserve visible focus after asynchronous updates. Respect `prefers-reduced-motion` for nonessential animations.
+- Check contrast, keyboard behavior, 200%/400% zoom or equivalent reflow, and screen-reader behavior where possible.
+- Use Lighthouse/axe as supporting checks; **a high automated score does not certify WCAG 2.2 AA compliance**.
 
-For the **legacy-validation comparison**:
-- Capture an original or recreated trace of the five-effect chain; label examples and estimates honestly.
-- Test empty inputs, rapid typing, correction of errors, and successful/failed submit.
-- Confirm no maximum-update-depth crash or stale errors after refactor.
+## 7. Required testing and evidence
 
-For **Sprint 3**:
-- In Chrome DevTools → Network, use **Slow 3G** and optionally **Disable cache**.
-- Switch `nasa` → `esports-tribunal` → `notNasa` rapidly while fetches remain pending.
-- Confirm old browser requests show cancelled/aborted where supported; check that final UI matches only the active channel.
-- Repeat for JSX and TSX; account for React Strict Mode development behavior.
-- Record a true backend failure and show its user-facing treatment; distinguish it from intentional cancellation.
-- Save evidence to `evidence/validation-baseline.md`, `network-cancellation.md`, `fullstack-error-log.md`, and `accessibility-checklist.md`, or instructor-required equivalents.
-- Logs/screenshots must omit credentials, tokens, session IDs, and personal information.
-- Never fabricate logs, timings, screenshots, HTTP status codes, React render counts, or a11y audit results.
+**Legacy validation:**
 
-## 8. Git and delivery rules
+- Document the five-stage chain and identify which effects cause redundant synchronization.
+- Test empty/invalid/valid inputs, rapid typing, correction, and failed submit.
+- Compare actual React DevTools traces before/after when safely measurable; distinguish simulated examples from observed data.
+- Save results under `Lab04_Exercise02/evidence/validation-baseline.md`.
 
-- Keep commits **atomic and descriptive** at meaningful task boundaries. Prioritize separate commits for legacy analysis, JSX validation, TSX validation, backend API, JSX hook, TSX hook, and verification evidence.
-- Suggested message style: `type(ex1.3-scope): short imperative description`.
-- Check `git status` and `git diff --staged` before committing.
-- Stage only relevant files. Do not commit `node_modules/`, `dist/`, `.env`, private logs, or secrets.
-- Run the affected project's build before committing code. Confirm `git push` succeeds before claiming GitHub is updated.
-- Preserve earlier commits and code from Exercises 1.1/1.2 unless the instructor directs otherwise.
-- Do not rewrite pushed history, force-push, or change a remote without explicit student approval.
-- If an error occurs, ask for or use the **exact terminal output**, explain its cause, and offer the smallest safe fix.
+**Sprint 3 cancellation:**
 
-## 9. Definition of done
+- In Chrome DevTools → Network, choose **Slow 3G** and optionally **Disable cache**.
+- Switch rapidly: `nasa` → `esports-tribunal` → `notNasa` while requests are still in flight.
+- Verify old requests are cancelled/aborted on the client, the active channel wins, and no stale results appear.
+- Record screenshot references and exact observed behavior in `Lab04_Exercise02/evidence/network-cancellation.md`.
 
-Exercise 1.3 and Sprint 3 may be marked complete only when:
+**Full-stack errors:**
 
-1. The original five-effect anti-pattern is documented, and the refactored forms avoid redundant state-sync loops.
-2. JSX and TSX forms behave equivalently and validate correctly during rapid input.
-3. A real backend supports the three specified channels; both hooks fetch correct data.
-4. Obsolete in-flight requests are cancelled via `AbortController`, verified under simulated Slow 3G.
-5. Full-stack error/cancellation logs are saved and distinguish real failures from intentional aborts.
-6. Relevant WCAG 2.2 A/AA checks and React DevTools checks are performed and documented.
-7. Frontend builds succeed, repository changes are committed, and the latest work is pushed.
+- Trigger at least one controlled genuine HTTP/network failure; never redefine `notNasa` as an error channel without a real specification.
+- Show appropriate user-facing error handling and verify aborts are not reported as failures.
+- Save sanitized client/server observations under `Lab04_Exercise02/evidence/fullstack-error-log.md`.
 
-## 10. Authoritative references
+**Accessibility:**
+
+- Test the form and channel switcher across loading, success, empty, invalid, and error states.
+- Use keyboard, React DevTools, accessibility audit tooling, and manual inspection.
+- Record actual findings under `Lab04_Exercise02/evidence/accessibility-checklist.md`.
+
+**Never invent** Network status, logs, timestamps, measurements, screenshots, test passes, or missing files.
+
+## 8. Git and delivery discipline
+
+- Commit inside the **existing repository**, with work scoped to `Lab04_Exercise02/`; do not push or modify unrelated `Lab04_Exercise01` changes.
+- Use clear **atomic commits** at meaningful milestones. Suggested names:
+  - `docs(ex1.3): update TSX-only task plan and AI rules`
+  - `chore(ex1.3): initialize TypeScript frontend`
+  - `docs(ex1.3): analyze legacy validation effect chain`
+  - `refactor(ex1.3): replace chained effects with typed form validation`
+  - `feat(ex1.3): add channel messages API`
+  - `feat(ex1.3): implement typed cancellable useForumMessages hook`
+  - `feat(ex1.3): add accessible live channel switcher`
+  - `test(ex1.3): document cancellation and full-stack errors`
+- Use `git status` and `git diff --staged` before commit. Use `git add Lab04_Exercise02/...` when running from repository root, or `git add ...` for specific files within that folder.
+- Build with `npm run build` from `Lab04_Exercise02/app` and smoke-test the actual backend before claiming task completion.
+- Do **not** commit `node_modules`, `dist`, `.env`, tokens, or private logs. Sanitized learning evidence is fine.
+- Use `git push` only after a successful commit; confirm success. Do not force-push, rewrite history, reinitialize Git, or change remotes without user permission.
+
+## 9. Definition of done — TSX only
+
+Exercise 1.3 and Sprint 3 are complete when:
+
+1. The legacy five-effect anti-pattern is analyzed and documented without a live infinite loop.
+2. The **single** `Lab04_Exercise02/app` TSX form uses typed controlled inputs and safe pure validation.
+3. A real local/instructor backend provides data for all **three** specified channels.
+4. `useForumMessages.ts` cancels obsolete requests with `AbortController` and shows no stale channel results.
+5. Chrome Slow 3G cancellation and genuine full-stack error behavior are **actually verified and logged**.
+6. Relevant WCAG 2.2 A/AA and React DevTools checks are performed and documented.
+7. The TSX app builds, commits are atomic, GitHub push succeeds, and **`Lab04_Exercise01` is unchanged**.
+
+## 10. Reference documentation
 
 - React — You Might Not Need an Effect: https://react.dev/learn/you-might-not-need-an-effect
-- React — Synchronizing with Effects: https://react.dev/learn/synchronizing-with-effects
-- React — useEffect: https://react.dev/reference/react/useEffect
-- MDN — Using the Fetch API: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+- React — `useEffect`: https://react.dev/reference/react/useEffect
 - MDN — AbortController: https://developer.mozilla.org/en-US/docs/Web/API/AbortController
+- MDN — Using Fetch: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 - W3C — WCAG 2.2: https://www.w3.org/TR/WCAG22/
 - W3C — WCAG 2.2 Quick Reference: https://www.w3.org/WAI/WCAG22/quickref/
