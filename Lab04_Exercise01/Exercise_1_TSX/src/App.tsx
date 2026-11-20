@@ -1,11 +1,17 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router";
 
 import PeopleLayout from "./layouts/PeopleLayout";
 import Home from "./pages/Home";
 import About from "./pages/About";
-import PersonDetail from "./components/PersonDetail";
+import PersonDetailSkeleton from "./components/PersonDetailSkeleton";
 
 import "./App.css";
+
+// Lazy load PersonDetail
+const PersonDetail = lazy(() =>
+  import("./components/PersonDetail")
+);
 
 export default function App() {
   return (
@@ -14,12 +20,18 @@ export default function App() {
         <Route element={<Home />}>
           <Route
             index
-            element={<p>Select a person to view their details.</p>}
+            element={
+              <p>Select a person to view their details.</p>
+            }
           />
 
           <Route
             path="people/:id"
-            element={<PersonDetail />}
+            element={
+              <Suspense fallback={<PersonDetailSkeleton />}>
+                <PersonDetail />
+              </Suspense>
+            }
           />
         </Route>
 
